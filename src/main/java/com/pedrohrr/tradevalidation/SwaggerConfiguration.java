@@ -15,7 +15,7 @@ public class SwaggerConfiguration {
     @Bean
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2).select()
-            .apis(RequestHandlerSelectors.basePackage("com.phrrodr.tradevalidation.controller"))
+            .apis(RequestHandlerSelectors.basePackage("com.pedrohrr.tradevalidation.controller"))
             .paths(PathSelectors.any()).build();
     }
 
