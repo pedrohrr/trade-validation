@@ -1,10 +1,13 @@
 package com.pedrohrr.tradevalidation.validation;
 
+import com.pedrohrr.tradevalidation.data.ForwardData;
 import com.pedrohrr.tradevalidation.data.OptionsData;
+import com.pedrohrr.tradevalidation.data.SpotData;
 import com.pedrohrr.tradevalidation.data.TransactionData;
 import com.pedrohrr.tradevalidation.data.ValidationData;
 
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.util.Currency;
 import java.util.Objects;
 
@@ -27,12 +30,17 @@ public final class Validations {
                 data.addMessage("Value Date cannot be before Trade Date");
             }
 
-            if (DayOfWeek.SATURDAY.equals(data.getValueDate().getDayOfWeek()) || DayOfWeek.SUNDAY.equals(data.getValueDate().getDayOfWeek())) {
+            final LocalDate date = data.getValueDate();
+            if (isNotWorkingDay(date)) {
                 data.addMessage("Value date cannot fall on weekend or non-working day for currency");
             }
         } catch (NullPointerException e) {
             data.addMessage(e.getMessage());
         }
+    }
+
+    private static boolean isNotWorkingDay(final LocalDate date) {
+        return DayOfWeek.SATURDAY.equals(date.getDayOfWeek()) || DayOfWeek.SUNDAY.equals(date.getDayOfWeek());
     }
 
     public static void customer(final TransactionData data) {
@@ -54,8 +62,8 @@ public final class Validations {
             if (data.getCcyPair().length() != 6) {
                 data.addMessage("Currency pair in wrong format");
             } else {
-                final String ccyFrom = data.getCcyPair().substring(0, 2);
-                final String ccyTo = data.getCcyPair().substring(3, 5);
+                final String ccyFrom = data.getCcyPair().substring(0, 3);
+                final String ccyTo = data.getCcyPair().substring(3, 6);
 
                 if (!validCurrency(ccyFrom)) {
                     data.addMessage("Currency Pair (from) is not a valid currency");
@@ -89,5 +97,34 @@ public final class Validations {
 
     private static boolean validCurrency(final String currency) {
         return Currency.getAvailableCurrencies().stream().anyMatch(c -> c.getCurrencyCode().equals(currency));
+    }
+
+    public static void valueAndTradeDate(final SpotData data) {
+        try {
+            Objects.requireNonNull(data.getValueDate(), "Value Date cannot be null");
+            Objects.requireNonNull(data.getTradeDate(), "Trade Date cannot be null");
+
+            if (getWorkingDays(data.getTradeDate(), data.getValueDate()) < 2) {
+                data.addMessage("Spot demands at least 2 working days between trade and value date");
+            }
+
+        } catch (NullPointerException e) {
+            data.addMessage(e.getMessage());
+        }
+    }
+
+    private static int getWorkingDays(LocalDate compareFrom, LocalDate compareTo) {
+        int workingDays = 0;
+        LocalDate comparison = compareFrom.plusDays(1l);
+        do {
+            if (isNotWorkingDay(comparison)) {
+                workingDays++;
+            }
+        } while ((comparison = comparison.plusDays(1l)).equals(compareTo));
+        return workingDays;
+    }
+
+    public static void dateAgainstType(final ForwardData data) {
+
     }
 }

@@ -3,15 +3,11 @@ package com.pedrohrr.tradevalidation.data;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.pedrohrr.tradevalidation.enumeration.TransactionDirection;
-import com.pedrohrr.tradevalidation.enumeration.TransactionType;
 import com.pedrohrr.tradevalidation.validation.Validations;
 import lombok.Data;
-import lombok.NonNull;
-import lombok.Value;
+import lombok.EqualsAndHashCode;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Objects;
 
 @Data
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
@@ -20,7 +16,8 @@ import java.util.Objects;
     @JsonSubTypes.Type(value = ForwardData.class, name = "Forward"),
     @JsonSubTypes.Type(value = OptionsData.class, name = "VanillaOption")
 })
-public abstract class TransactionData extends ValidationData {
+@EqualsAndHashCode(callSuper = false)
+public class TransactionData extends ValidationData {
 
     private String customer;
     private String ccyPair;
@@ -33,8 +30,6 @@ public abstract class TransactionData extends ValidationData {
     private String legalEntity;
     private String trader;
     private String style;
-
-    public abstract TransactionType getType();
 
     public boolean validate() {
         Validations.valueAndTradeDate(this);

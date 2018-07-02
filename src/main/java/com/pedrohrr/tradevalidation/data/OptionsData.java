@@ -1,6 +1,5 @@
 package com.pedrohrr.tradevalidation.data;
 
-import com.pedrohrr.tradevalidation.enumeration.TransactionType;
 import com.pedrohrr.tradevalidation.validation.Validations;
 import lombok.Data;
 
@@ -17,11 +16,6 @@ public class OptionsData extends TransactionData {
     private String premiumCcy;
     private String premiumType;
     private String premiumDate;
-
-    @Override
-    public TransactionType getType() {
-        return TransactionType.VANILLAOPTION;
-    }
 
     @Override
     public boolean validate() {

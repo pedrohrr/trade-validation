@@ -1,10 +1,15 @@
 package com.pedrohrr.tradevalidation.data;
 
-import com.pedrohrr.tradevalidation.enumeration.TransactionType;
+import com.pedrohrr.tradevalidation.validation.Validations;
 
 public class SpotData extends TransactionData {
+
     @Override
-    public TransactionType getType() {
-        return TransactionType.SPOT;
+    public boolean validate() {
+        super.validate();
+
+        Validations.valueAndTradeDate(this);
+
+        return isValid();
     }
 }
